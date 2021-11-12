@@ -1,0 +1,98 @@
+$primary-color: rgb(245, 245, 245);
+$color-warning:rgb(242, 198, 78);
+$color-default: rbg(14, 14,14); 
+$title:24px;
+$bg-light:#fff ;
+$color-light: #ccc;
+
+
+// for res
+@mixin border($size:1.5px){
+    border: $size solid $color-light;
+    padding: 2px 8px;
+
+}
+@mixin curve($size: 4px){
+    border-radius: 50%;
+}
+@mixin grid{
+    display: grid;
+    justify-content: center;
+
+}
+@mixin flex($direction: column, $justify-content: flex-start, $padding: 0 64px){
+    display:flex;
+    flex-direction: $direction;
+    justify-content: $justify-content;
+    padding: $padding;
+}
+@mixin borders-shadow{
+    border-top: 8px solid $color-warning;
+    box-shadow: 0 3px 3px $color-light;
+}
+@mixin size($min-height: 500px, $min-width:500px){
+    min-height: $min-height;
+    min-width:  $min-width;
+    
+}
+@mixin text-center{
+    text-align:center;
+}
+.container{
+    background-color: $bg-light;
+    @include borders-shadow;
+    @include flex;
+    @include size;
+    @include text-center;
+}
+// .login-container{}
+
+.title{
+    font-size: $title;
+    color: $color-default;
+    
+    }
+ //Nesting div> span input in normal css
+ div {
+     @include grid;
+     grid-template-columns: minmax(40px, auto) 1fr;
+    //  position: absolute;
+     row-gap: 20px;
+     span{
+       @include border;  
+       font-size: 26px;
+       @include text-center;  
+       color: #333333;
+     }
+     input{
+        @include border;      
+       border-top-right-radius: 4px;
+       border-left: 0;
+     }
+     select{
+        @include border; 
+       padding:8px;
+     }
+     .radio{width: 150px;}
+     button{
+         background:$color-warning;
+         color:$primary-color;
+         @include border;   
+         margin-bottom: 32px;
+         padding:12px;
+     }
+ }
+.flex-row{
+    @include flex($direction: row, $justify-content: space-between, $padding: 0 0);
+    max-width: 100vh;
+}
+body {
+  background: $primary-color;
+  @include grid;
+  
+}
+button, body, input{
+    font-size: 16px;
+    font-family:150;
+    color: #333;
+}

@@ -1,3 +1,4 @@
+<%@page import="com.example.model.UserModel"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
@@ -19,33 +20,46 @@
             <h2>Responsive Registration Form</h2>
          </div>
           <%
-            Object error = request.getAttribute("error");
+            Object error = request.getAttribute("error") ;
             Object checkError=  error !=null ?"Ooops"+error:" ";
-          %>          
-           <%=           checkError        %>
+            //TODO: retrieve data from session to show on form fields so that user don't need to retype
+            Object fname = request.getAttribute("fname");  
+            Object lname = request.getAttribute("lname");
+            Object username = request.getAttribute("username");
+            Object phoneNumber = request.getAttribute("phoneNumber");
+            Object age = request.getAttribute("age");
+
+           // Object username = request.getAttribute("username");
+
+
+          %>   
+          <small class="danger">
+               <%=           checkError  +"" + request.getAttribute("fname")    %>
+          </small>
+          
            
             <form  method="POST" action="Signup">
             <div class="grid">
                <div class="grid-col-2">
                   <span> <i aria-hidden="true" class="fa fa-user"></i> </span>
-                  <input type="text" name="fname" required placeholder="First Name" class="md"/>
+                  <input type="text" name="fname" required placeholder="First Name" class="md" value="<%= (fname !=null) ? fname:" "%>" />
                </div>
                <div class="grid-col-2 ml">
                   <span> <i aria-hidden="true" class="fa fa-user"></i> </span>
-                  <input type="text" name="lname" required placeholder="Last Name"  class="md"/>
+                  <input type="text" name="lname" required placeholder="Last Name"  class="md" value="<%= (lname !=null) ? lname:" "%>" />
                </div>
             </div>
             <div class="grid-col-2">
                <span><i class="fa fa-user"></i></span>
-               <input type="text" placeholder="Username" name="username" />
+               <input type="text" placeholder="Username" name="username" value="<%= (username !=null) ? username:" "%>"  />
             </div>
             <div class="grid-col-2">
                <span><i class="fa fa-user"></i></span>
-               <input type="number" placeholder="age" name="age" required />
+               <input type="number" placeholder="age" name="age" required value="<%= (age !=null) ? age:" "%>"  />
             </div>
             <div class="grid-col-2">
                <span><i aria-hidden="true" class="fa fa-mobile "></i></span>
-               <input type="text" placeholder="phone Number" name="phoneNumber" />
+               <input type="text" placeholder="phone Number" name="phoneNumber"  value="<%= (phoneNumber !=null) ? phoneNumber:" "%>"  />
             </div>
             <div class="grid-col-2">
                <span><i aria-hidden="true" class="fa fa-lock"></i></span>

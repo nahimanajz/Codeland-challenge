@@ -47,11 +47,12 @@ public class Signup extends HttpServlet {
 		String confirmPassword = req.getParameter("retype_password");		
 		String role = req.getParameter("roles");		
 		int age = Integer.parseInt(req.getParameter("age"));
+                boolean detectError = false;
                 
                 if(password.equals(confirmPassword) == false){
+                    detectError = true;
                     req.setAttribute("error", "Password doesnot match");
-                    RequestDispatcher rd = req.getRequestDispatcher("/index.jsp");
-                    rd.forward(req, response);
+                    
                 }
 	
                 String hashedpassword = HashPass.getInstance().hashPassword(password, String.valueOf(age));                
@@ -66,7 +67,6 @@ public class Signup extends HttpServlet {
                 um.setUserRole(role);
 		um.setGender(req.getParameter("gender"));
                 
-
                try {
 		    
                      if(um.getUserRole().equalsIgnoreCase("admin")){
@@ -75,24 +75,32 @@ public class Signup extends HttpServlet {
                                 getServletContext().getRequestDispatcher("/WEB-INF/jsp/login.jsp").include(req, response);
                             }else{
                                 req.setAttribute("error", "Password should be 10 characters");
-                                RequestDispatcher rd = req.getRequestDispatcher("/index.jsp");
-                                rd.forward(req, response);
+                                detectError = true;                         
                             }
-                            
                      }else{
                          if(ValidatePassword.getInstance().guestPassword(password) == true){
                           lhmUsers = guest.register(um);  
                            getServletContext().getRequestDispatcher("/WEB-INF/jsp/login.jsp").include(req, response);
                          }else {                             
                              req.setAttribute("error", "Password should be only 5 characters");
-                         
-                             RequestDispatcher rd = req.getRequestDispatcher("/index.jsp");
-                             rd.forward(req, response);
+                             detectError = true;
                          }
                      }
 		} catch (Exception e) {
 		    e.printStackTrace();
 	        }
+               if(detectError == true){
+                    this.setSession(req, "username", username);
+                    this.setSession(req, "fname", req.getParameter("fname"));                      
+                    this.setSession(req, "lname", req.getParameter("lname"));
+                    this.setSession(req, "phoneNumber", req.getParameter("phoneNumber"));
+                    this.setSession(req, "gender", req.getParameter("gender"));
+                    this.setSession(req, "age", req.getParameter("age"));
+        
+                    RequestDispatcher rd = req.getRequestDispatcher("/index.jsp");
+                    rd.forward(req, response);
+               }
+       
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -136,5 +144,7 @@ public class Signup extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+    private void setSession(HttpServletRequest req, String key, String value){        
+        req.setAttribute(key, value);
+    }
 }

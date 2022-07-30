@@ -4,10 +4,8 @@
  */
 package servlet;
 
-import com.example.model.UserModel;
-import example.helpers.HashPass;
-import example.intaface.User;
-import example.db.CoreDB;
+import com.pharmacy.model.UserModel;
+import pharmacy.db.CoreDB;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.LinkedHashMap;
@@ -18,6 +16,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import pharmacy.controller.Admin;
+import pharmacy.controller.Patient;
+import pharmacy.controller.Pharmacist;
+import pharmacy.controller.Physician;
 
 /**
  *
@@ -37,7 +39,6 @@ public class Authenticate extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-         getServletContext().getRequestDispatcher("/WEB-INF/jsp/login.jsp").include(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -67,34 +68,41 @@ public class Authenticate extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(req, response);
-        
-         UserModel um = new UserModel();
-         LinkedHashMap<Integer, UserModel> lhmpUser = new LinkedHashMap<Integer, UserModel>();
+        PrintWriter out;
+        out = response.getWriter();
 
+     
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
-        um.setUsername(username);
-        um.setUserPassword(username);
-        HttpSession session = req.getSession();
        	
-        lhmpUser = CoreDB.getInstance().getData();
+        Admin admin = new Admin();
+        Patient patient = new Patient();        
+        Pharmacist pharmacist = new Pharmacist();       
+        Physician physician = new Physician();
         
-        for (Map.Entry<Integer, UserModel> entry : lhmpUser.entrySet()) {               
-                UserModel umData = entry.getValue();
-
-                String unHashedPass = HashPass.getInstance().unHashedPass(umData.getUserPassword(),umData.getAge());
-
-                if (username.equals(umData.getUsername()) && password.equals(unHashedPass)== true) {
-                        session.setAttribute("username", umData.getUsername());
-                        getServletContext().getRequestDispatcher("/WEB-INF/jsp/detail.jsp").include(req, response);				
-
-                } else {
-
-                        getServletContext().getRequestDispatcher("/WEB-INF/jsp/notfound.jsp").include(req, response);
-
-                }
-		}
+        //String usertype = null;
+        
+        if(admin.login(password, username) != null){
+           // usertype = admin.login(password, username);    
+           out.print("Password:"+ password +"\n Username =>" + username +" -->"+ admin.login(password, username));
+        }
+        
+        /*else if(patient.login(password, username) != null) {
+             usertype = patient.login(password, username);
+             
+        } else if(pharmacist.login(password, username) != null) {
+             usertype = pharmacist.login(password, username);
+            
+        } else if(physician.login(password, username) != null) {
+            
+            usertype = physician.login(password, username);
+            
+        } 
+        */
+        
+        // out.print(admin.login(password, username));
+        
 	}
 
 
@@ -107,5 +115,5 @@ public class Authenticate extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+    
 }

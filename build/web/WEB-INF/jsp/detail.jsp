@@ -4,8 +4,8 @@
     Author     : janvier
 --%>
 
-<%@page import="com.example.model.UserModel"%>
-<%@page import="example.db.CoreDB"%>
+<%@page import="com.pharmacy.model.UserModel"%>
+<%@page import="pharmacy.db.CoreDB"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.LinkedHashMap"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>

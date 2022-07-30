@@ -15,6 +15,6 @@
       </style>
     </head>
     <body>
-        <h1>Ooops, You provided incorrect credentials </h1>
+        <h1>Oops, You provided incorrect credentials </h1>
     </body>
 </html>

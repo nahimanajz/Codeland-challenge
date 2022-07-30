@@ -4,11 +4,12 @@
  */
 package servlet;
 
-import com.example.model.UserModel;
-import example.controller.Admin;
-import example.controller.Guest;
-import example.helpers.HashPass;
-import example.helpers.ValidatePassword;
+import com.google.gson.Gson;
+import com.pharmacy.model.UserModel;
+import pharmacy.controller.*;
+
+
+import pharmacy.helpers.ValidatePassword;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.LinkedHashMap;
@@ -25,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "Signup", urlPatterns = {"/Signup"})
 public class Signup extends HttpServlet {
-
+    PrintWriter out;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -37,25 +38,32 @@ public class Signup extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest req, HttpServletResponse response)
             throws ServletException, IOException {
-       // getServletContext().getRequestDispatcher("/index.jsp").include(request, response);
+                
+                 out = response.getWriter();
+               try {
+      
                 Admin admin = new Admin();
-		Guest guest = new Guest();
+		Patient patient = new Patient();
+                Pharmacist pharmacist = new Pharmacist();
+                Physician physician = new Physician();
+
+
 		LinkedHashMap<Integer, UserModel> lhmUsers = new LinkedHashMap<Integer, UserModel>();
 
 		String username = req.getParameter("username");
-		String password = req.getParameter("user_password");
+		String password = req.getParameter("password");
 		String confirmPassword = req.getParameter("retype_password");		
-		String role = req.getParameter("roles");		
+		String role = req.getParameter("usertype");		
 		int age = Integer.parseInt(req.getParameter("age"));
                 boolean detectError = false;
                 
+                String successMessage = null;
+                
                 if(password.equals(confirmPassword) == false){
                     detectError = true;
-                    req.setAttribute("error", "Password doesnot match");
+                    successMessage= "Passwords do not match";
                     
                 }
-	
-                String hashedpassword = HashPass.getInstance().hashPassword(password, String.valueOf(age));                
                 UserModel um = new UserModel();
                 
 		um.setUsername(username);
@@ -63,54 +71,74 @@ public class Signup extends HttpServlet {
 		um.setLname(req.getParameter("lname"));
 		um.setAge(age);
 		um.setPhoneNumber(req.getParameter("phoneNumber"));		
-		um.setUserPassword(hashedpassword);
+		um.setUserPassword(password);
                 um.setUserRole(role);
 		um.setGender(req.getParameter("gender"));
-                
-               try {
-		    
-                     if(um.getUserRole().equalsIgnoreCase("admin")){
+                    
+                   if(ValidatePassword.getInstance().isNumber(password)) {
+                       
+                       if(um.getUserRole().equalsIgnoreCase("admin")){
                             if(ValidatePassword.getInstance().adminPassword(password) == true){
-                                lhmUsers = admin.register(um);
-                                getServletContext().getRequestDispatcher("/WEB-INF/jsp/login.jsp").include(req, response);
+                                lhmUsers = admin.signup(um);
+                                successMessage = "Admin account is created successfully";
                             }else{
-                                req.setAttribute("error", "Password should be 10 characters");
-                                detectError = true;                         
+                                successMessage="Password should be 8 numbers";
+                                                       
                             }
-                     }else{
-                         if(ValidatePassword.getInstance().guestPassword(password) == true){
-                          lhmUsers = guest.register(um);  
-                           getServletContext().getRequestDispatcher("/WEB-INF/jsp/login.jsp").include(req, response);
+                     }else if(um.getUserRole().equalsIgnoreCase("Patient")){
+                         if(ValidatePassword.getInstance().patientPassword(password) == true){
+                          lhmUsers = patient.signup(um);  
+                           successMessage = "Patient account is created successfully";
                          }else {                             
-                             req.setAttribute("error", "Password should be only 5 characters");
+                              successMessage = "Password should be only 7 numbers";
+                              detectError = true;
+                         }
+                     }else if(um.getUserRole().equalsIgnoreCase("Physician")){
+                     
+                         if(ValidatePassword.getInstance().physicianPassword(password) == true){
+                          lhmUsers = physician.signup(um);  
+                            successMessage = "Physician account is created successfully";
+                         }else {                             
+                             successMessage =  "Password should be only 6 numbers";
                              detectError = true;
                          }
+                     
+                     }else if(um.getUserRole().equalsIgnoreCase("pharmacist")){
+                         
+                         if(ValidatePassword.getInstance().pharmacistPassword(password) == true){
+                          lhmUsers = pharmacist.signup(um);  
+                           successMessage = "Pharmacist account is created";
+                         }else {                           
+                            
+                             successMessage = "Password should be only 5 numbers";
+                         }
+                     
                      }
-		} catch (Exception e) {
-		    e.printStackTrace();
-	        }
+                       
+                   } else {
+                       successMessage = "Password must be number";
+                   }
+                 
+                  out.print(successMessage);
+                   
+		
                if(detectError == true){
-                    this.setSession(req, "username", username);
-                    this.setSession(req, "fname", req.getParameter("fname"));                      
-                    this.setSession(req, "lname", req.getParameter("lname"));
-                    this.setSession(req, "phoneNumber", req.getParameter("phoneNumber"));
-                    this.setSession(req, "gender", req.getParameter("gender"));
-                    this.setSession(req, "age", req.getParameter("age"));
-        
-                    RequestDispatcher rd = req.getRequestDispatcher("/index.jsp");
-                    rd.forward(req, response);
+                    successMessage = "Something went wrong";
                }
+               } catch (Exception e) {
+		    e.printStackTrace();
+                    out.print(e.getMessage());
+	        }
        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -147,4 +175,5 @@ public class Signup extends HttpServlet {
     private void setSession(HttpServletRequest req, String key, String value){        
         req.setAttribute(key, value);
     }
+   
 }
